@@ -4,6 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>KALYAN 567 - Official APK Download</title>
+  <!-- Meta Pixel Code -->
+  <script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '2241743359726852');
+  fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=2241743359726852&ev=PageView&noscript=1"
+  /></noscript>
+  <!-- End Meta Pixel Code -->
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts: Orbitron & Rajdhani for gaming neon typography -->
@@ -309,10 +327,17 @@
     }
     setInterval(updateTimer, 1000);
 
-    // Start the real APK download immediately when the user clicks the button.
+    // Track the user's APK download-button click, then start the direct download.
+    // Browsers cannot confirm that a cross-origin file download fully completed.
     function handleDownload() {
       const apkUrl = 'https://github.com/digitalkaushal123-ship-it/kalyan567/raw/refs/heads/main/50matka%20(19).apk';
-      window.location.href = apkUrl;
+      if (typeof window.fbq === 'function') {
+        window.fbq('trackCustom', 'APKDownload');
+      }
+      // Give the Meta Pixel request a brief moment to queue before navigating away.
+      window.setTimeout(() => {
+        window.location.href = apkUrl;
+      }, 200);
     }
 
     function closeModal() {
