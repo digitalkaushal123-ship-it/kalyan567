@@ -27,12 +27,13 @@ function sendMetaEvent(req, eventId) {
         content_name: 'APK download response started'
       }
   };
-  // Set META_TEST_EVENT_CODE temporarily to the code shown in Events Manager
-  // > Test Events when validating. Remove it afterwards for normal reporting.
+  // Meta expects test_event_code at the top level of the Conversions API payload,
+  // not inside the individual event object. Remove this variable after testing.
+  const payloadData = { data: [event] };
   if (process.env.META_TEST_EVENT_CODE) {
-    event.test_event_code = process.env.META_TEST_EVENT_CODE;
+    payloadData.test_event_code = process.env.META_TEST_EVENT_CODE;
   }
-  const payload = JSON.stringify({ data: [event] });
+  const payload = JSON.stringify(payloadData);
 
   return new Promise((resolve) => {
     const url = new URL(`https://graph.facebook.com/v22.0/${PIXEL_ID}/events?access_token=${encodeURIComponent(accessToken)}`);
