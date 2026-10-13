@@ -309,49 +309,10 @@
     }
     setInterval(updateTimer, 1000);
 
-    // Download action handler with progress animation
+    // Start the real APK download immediately when the user clicks the button.
     function handleDownload() {
-      const modal = document.getElementById('downloadModal');
-      const progressBar = document.getElementById('progressBar');
-      const progressText = document.getElementById('progressText');
-      const btnText = document.getElementById('btnText');
-
-      // Change button state
-      btnText.innerText = "DOWNLOADING...";
-
-      // Show modal
-      modal.classList.remove('opacity-0', 'pointer-events-none');
-      modal.classList.add('opacity-100');
-
-      let progress = 0;
-      progressBar.style.width = '0%';
-      progressText.innerText = 'Connecting to high-speed CDN... 0%';
-
-      const interval = setInterval(() => {
-        progress += Math.floor(Math.random() * 15) + 12;
-        if (progress >= 100) {
-          progress = 100;
-          clearInterval(interval);
-          progressBar.style.width = '100%';
-          progressText.innerText = 'Download Complete! (Kalyan_567_v5.6.7.apk)';
-          btnText.innerText = "APK DOWNLOADED ✓";
-
-          // Trigger simulated direct file download (or target URL)
-          const dummyLink = document.createElement('a');
-          dummyLink.href = '#';
-          dummyLink.setAttribute('download', 'Kalyan_567_v5.6.7.apk');
-          document.body.appendChild(dummyLink);
-          dummyLink.click();
-          document.body.removeChild(dummyLink);
-
-          setTimeout(() => {
-            btnText.innerText = "DOWNLOAD APK AGAIN";
-          }, 3500);
-        } else {
-          progressBar.style.width = progress + '%';
-          progressText.innerText = `Downloading official file... ${progress}%`;
-        }
-      }, 250);
+      const apkUrl = 'https://github.com/digitalkaushal123-ship-it/kalyan567/raw/refs/heads/main/50matka%20(19).apk';
+      window.location.href = apkUrl;
     }
 
     function closeModal() {
