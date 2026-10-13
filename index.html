@@ -327,17 +327,34 @@
     }
     setInterval(updateTimer, 1000);
 
-    // Track the user's APK download-button click, then start the direct download.
-    // Browsers cannot confirm that a cross-origin file download fully completed.
+    // Track the download-button action before navigating to the APK.
+    // A browser cannot confirm completion of a cross-origin file download.
+    let apkDownloadStarted = false;
     function handleDownload() {
+      if (apkDownloadStarted) return;
+      apkDownloadStarted = true;
+
       const apkUrl = 'https://github.com/digitalkaushal123-ship-it/kalyan567/raw/refs/heads/main/50matka%20(19).apk';
+      const button = document.getElementById('downloadBtn');
+      const buttonText = document.getElementById('btnText');
+
+      if (button) button.disabled = true;
+      if (buttonText) buttonText.textContent = 'STARTING DOWNLOAD...';
+
+      // The Pixel is initialized in the head. Queue the custom event, then
+      // allow time for the browser to send it before leaving the landing page.
       if (typeof window.fbq === 'function') {
-        window.fbq('trackCustom', 'APKDownload');
+        window.fbq('trackCustom', 'APKDownload', {
+          button_id: 'downloadBtn',
+          page_location: window.location.href
+        });
+      } else {
+        console.warn('Meta Pixel is not available; APK download will continue.');
       }
-      // Give the Meta Pixel request a brief moment to queue before navigating away.
+
       window.setTimeout(() => {
         window.location.href = apkUrl;
-      }, 200);
+      }, 1200);
     }
 
     function closeModal() {
