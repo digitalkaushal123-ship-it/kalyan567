@@ -327,9 +327,7 @@
     }
     setInterval(updateTimer, 1000);
 
-    // Send the browser to our same-origin endpoint. The server requests the APK
-    // first, then sends APKDownload through Meta Conversions API when the APK
-    // host returns a successful response, before streaming the file to the user.
+    // Fire the standard browser Pixel event when the Download APK button is clicked.
     let apkDownloadStarted = false;
     function handleDownload() {
       if (apkDownloadStarted) return;
@@ -340,6 +338,11 @@
       if (button) button.disabled = true;
       if (buttonText) buttonText.textContent = 'STARTING DOWNLOAD...';
 
+      if (typeof window.fbq === 'function') {
+        window.fbq('track', 'Download');
+      }
+
+      // Keep the existing APK endpoint so download functionality remains intact.
       window.location.href = '/api/download';
     }
 
