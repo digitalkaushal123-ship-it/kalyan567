@@ -1,7 +1,8 @@
 const https = require('https');
 const { Readable } = require('stream');
 
-const PIXEL_ID = '2241743359726852';
+// Keep the server-side Conversions API event on the same Pixel as index.html.
+const PIXEL_ID = '1766741487918105';
 const APK_URL = 'https://github.com/digitalkaushal123-ship-it/kalyan567/raw/refs/heads/main/50matka%20(19).apk';
 
 function sendMetaEvent(req, eventId) {
@@ -14,21 +15,21 @@ function sendMetaEvent(req, eventId) {
   const forwardedFor = req.headers['x-forwarded-for'];
   const clientIp = forwardedFor ? forwardedFor.split(',')[0].trim() : req.socket.remoteAddress;
   const event = {
-      event_name: 'APKDownload',
-      event_time: Math.floor(Date.now() / 1000),
-      event_id: eventId,
-      action_source: 'website',
-      event_source_url: 'https://kalyan567.vercel.app/',
-      user_data: {
-        client_ip_address: clientIp,
-        client_user_agent: req.headers['user-agent'] || ''
-      },
-      custom_data: {
-        content_name: 'APK download response started'
-      }
+    event_name: 'Download',
+    event_time: Math.floor(Date.now() / 1000),
+    event_id: eventId,
+    action_source: 'website',
+    event_source_url: 'https://kalyan567.vercel.app/',
+    user_data: {
+      client_ip_address: clientIp,
+      client_user_agent: req.headers['user-agent'] || ''
+    },
+    custom_data: {
+      content_name: 'APK download response started'
+    }
   };
-  // Meta expects test_event_code at the top level of the Conversions API payload,
-  // not inside the individual event object. Remove this variable after testing.
+
+  // Meta expects test_event_code at the top level of the Conversions API payload.
   const payloadData = { data: [event] };
   if (process.env.META_TEST_EVENT_CODE) {
     payloadData.test_event_code = process.env.META_TEST_EVENT_CODE;
@@ -52,7 +53,7 @@ function sendMetaEvent(req, eventId) {
         if (response.statusCode < 200 || response.statusCode >= 300) {
           console.error('Meta Conversions API error:', response.statusCode, body);
         } else {
-          console.log('Meta APKDownload event accepted:', body);
+          console.log('Meta Download event accepted:', body);
         }
         resolve();
       });
@@ -73,16 +74,22 @@ module.exports = async function handler(req, res) {
     return res.status(405).send('Method Not Allowed');
   }
 
-  const upstream = await fetch(APK_URL, { method: req.method });
+  let upstream;
+  try {
+    upstream = await fetch(APK_URL, { method: req.method });
+  } catch (error) {
+    console.error('APK upstream request failed:', error.message);
+    return res.status(502).send('APK download is temporarily unavailable. Please try again later.');
+  }
+
   if (!upstream.ok) {
     console.error('APK upstream returned:', upstream.status);
     return res.status(502).send('APK download is temporarily unavailable. Please try again later.');
   }
 
-  const eventId = `apk-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  // Send the server-side event only after the APK host has accepted the request
-  // and returned a successful response. This records a successful response start,
-  // not proof that the user's device saved the complete file.
+  // Fire only after the APK host responds successfully; this indicates the download
+  // response has started, not that the entire file was saved on the user's device.
+  const eventId = `download-${Date.now()}-${Math.random().toString(36).slice(2)}`;
   await sendMetaEvent(req, eventId);
 
   res.statusCode = 200;
