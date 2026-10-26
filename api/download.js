@@ -1,72 +1,6 @@
-const https = require('https');
 const { Readable } = require('stream');
 
-// Keep the server-side Conversions API event on the same Pixel as index.html.
-const PIXEL_ID = '1766741487918105';
 const APK_URL = 'https://github.com/digitalkaushal123-ship-it/kalyan567/raw/refs/heads/main/50matka%20(19).apk';
-
-function sendMetaEvent(req, eventId) {
-  const accessToken = process.env.META_PIXEL_ACCESS_TOKEN;
-  if (!accessToken) {
-    console.error('META_PIXEL_ACCESS_TOKEN is not configured; download will work but Conversions API event cannot be sent.');
-    return Promise.resolve();
-  }
-
-  const forwardedFor = req.headers['x-forwarded-for'];
-  const clientIp = forwardedFor ? forwardedFor.split(',')[0].trim() : req.socket.remoteAddress;
-  const event = {
-    event_name: 'Download',
-    event_time: Math.floor(Date.now() / 1000),
-    event_id: eventId,
-    action_source: 'website',
-    event_source_url: 'https://kalyan567.vercel.app/',
-    user_data: {
-      client_ip_address: clientIp,
-      client_user_agent: req.headers['user-agent'] || ''
-    },
-    custom_data: {
-      content_name: 'APK download response started'
-    }
-  };
-
-  // Meta expects test_event_code at the top level of the Conversions API payload.
-  const payloadData = { data: [event] };
-  if (process.env.META_TEST_EVENT_CODE) {
-    payloadData.test_event_code = process.env.META_TEST_EVENT_CODE;
-  }
-  const payload = JSON.stringify(payloadData);
-
-  return new Promise((resolve) => {
-    const url = new URL(`https://graph.facebook.com/v22.0/${PIXEL_ID}/events?access_token=${encodeURIComponent(accessToken)}`);
-    const request = https.request(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(payload)
-      },
-      timeout: 4000
-    }, (response) => {
-      let body = '';
-      response.setEncoding('utf8');
-      response.on('data', chunk => { body += chunk; });
-      response.on('end', () => {
-        if (response.statusCode < 200 || response.statusCode >= 300) {
-          console.error('Meta Conversions API error:', response.statusCode, body);
-        } else {
-          console.log('Meta Download event accepted:', body);
-        }
-        resolve();
-      });
-    });
-    request.on('error', (error) => {
-      console.error('Meta Conversions API request failed:', error.message);
-      resolve();
-    });
-    request.on('timeout', () => request.destroy(new Error('Meta request timeout')));
-    request.write(payload);
-    request.end();
-  });
-}
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET' && req.method !== 'HEAD') {
@@ -87,11 +21,7 @@ module.exports = async function handler(req, res) {
     return res.status(502).send('APK download is temporarily unavailable. Please try again later.');
   }
 
-  // Fire only after the APK host responds successfully; this indicates the download
-  // response has started, not that the entire file was saved on the user's device.
-  const eventId = `download-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  await sendMetaEvent(req, eventId);
-
+  // This endpoint only serves the APK. Meta tracking is handled by the browser Pixel.
   res.statusCode = 200;
   res.setHeader('Content-Type', upstream.headers.get('content-type') || 'application/vnd.android.package-archive');
   res.setHeader('Content-Disposition', 'attachment; filename="50matka.apk"');
