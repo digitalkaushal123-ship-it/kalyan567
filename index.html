@@ -133,6 +133,8 @@
   .tech-grid { background-image:linear-gradient(rgba(37,99,235,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(37,99,235,.045) 1px,transparent 1px) !important; }
   main > div:first-child { background:rgba(255,255,255,.96) !important; border-color:#bfdbfe !important; box-shadow:0 24px 70px rgba(30,64,175,.12) !important; }
   #downloadModal > div { background:#fff !important; border-color:#93c5fd !important; }
+  #downloadBtn, #downloadBtn #btnText { font-family:'Inter', 'Arial Black', sans-serif !important; font-weight:900 !important; letter-spacing:.075em !important; text-transform:uppercase; text-shadow:0 1px 0 rgba(255,255,255,.12), 0 3px 12px rgba(3,37,108,.28); }
+  #downloadBtn #btnText { font-size:clamp(1.05rem,4.8vw,1.3rem); }
   #downloadBtn { color:#fff !important; background:linear-gradient(100deg,#2563eb,#0284c7,#1d4ed8) !important; box-shadow:0 12px 32px rgba(37,99,235,.25) !important; }
   #downloadModal button:last-child { color:#fff !important; background:#2563eb !important; }
   .text-slate-900 { color:#0f172a !important; }
@@ -255,7 +257,7 @@
       </div>
 
       <div class="w-full flex flex-col items-center">
-        <button id="downloadBtn" onclick="handleDownload()" class="shimmer-btn w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 via-sky-600 to-blue-500 hover:from-blue-500 hover:via-sky-500 hover:to-blue-500 active:scale-[0.98] transition-all duration-200 text-slate-900 font-orbitron font-extrabold text-lg sm:text-xl tracking-wider shadow-[0_10px_30px_rgba(168,85,247,0.45)] border border-blue-600/40 flex items-center justify-center gap-3 group">
+        <button id="downloadBtn" onclick="handleDownload()" class="shimmer-btn w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 via-sky-600 to-blue-500 hover:from-blue-500 hover:via-sky-500 hover:to-blue-500 active:scale-[0.98] transition-all duration-200 text-slate-900 font-orbitron font-black text-lg sm:text-xl tracking-wider shadow-[0_10px_30px_rgba(168,85,247,0.45)] border border-blue-600/40 flex items-center justify-center gap-3 group">
           <i class="fa-solid fa-download text-xl group-hover:translate-y-0.5 transition-transform duration-200"></i>
           <span id="btnText">DOWNLOAD APK</span>
         </button>
